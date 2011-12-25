@@ -17,61 +17,61 @@ t0 = 0;
 t1 = 2.5;
  
 size = (t1-t0)/h + 1;
-points = zeros(1,size);
-pointsT = zeros(1,size);
-x = t0:h:t1;
+inputVal = zeros(1,size);
+outputVal = zeros(1,size);
+args = t0:h:t1;
 for i = 1:size
-    t = (i-1)*h;
-    points(i) = sin(-3*t*t+5*t+10);
-    pointsT(i) = sin(-3*t*t + 5*t - 3)/3;
+    t = args(i-1);
+    inputVal(i) = sin(-3*t*t+5*t+10);
+    outputVal(i) = sin(-3*t*t + 5*t - 3)/3;
 end
-P = con2seq(points);
-T = con2seq(pointsT);
+P = con2seq(inputVal);
+T = con2seq(outputVal);
 
 %% 3.2
 % Задать задержки от 1 до 5. Задать скорость обучения равной 0.1.
-net = newlin([-1,1],1,0,0.1);
-net.inputweights{1,1}.delays = [1 2 3 4 5];
- 
+% net = newlin([-1,1], 1, 0, 0.1);
+% net.inputweights{1,1}.delays = [1 2 3 4 5];
+net = newlin(P, outputVal, [1 2 3 4 5], 0.1);
+
+%% 3.3
+% Инициализировать сеть случайными значениями. Занести в отчет весовые коэффициенты и смещения. 
 net.inputweights{1,1}.initFcn = 'rands';
 net.biases{1}.initFcn = 'rands';
 net = init(net);
-IW = net.IW{1,1};
-b = net.b{1};
-display(IW);
-display(b);
 
-%% 3.3
-% Инициализировать сеть случайными значениями. Занести в отчет весовые коэффициенты и смещения.
-net.adaptParam.passes = 70;
-[net, y, E, pf, af] = adapt(net, P(6:size), T(6:size), P(1:5));
-display(sqrt(mse(E)));
+display(net.IW{1,1});
+display(net.b{1});
 
 %% 3.4
 % Выполнить адаптацию с числом циклов равным 50. Занести в отчет величину ошибки
 % обучения с помощью функций sqrt(mse(e)). Отдельно передать в функцию адаптации
 % первые 5 элементов входной последовательности для инициализации задержек.
 % В дальнейшем использовать входную и выходную последовательности, начиная с 6 элемента.
-figure
+net.adaptParam.passes = 50;
+[net, y, E, pf, af] = adapt(net, P(6:size), T(6:size), P(1:5));
+display(sqrt(mse(E)));
+
+%% 3.5
+% Отобразить на графике входные и эталонные значения и значения, предсказанные сетью,
+% также отобразить точки заданного интервала. С помощью функции legend подписать кривые.
+% Перед отображением привести значения из массива ячеек к матрице.
+
+figure('Graphics')
 hold on
-plot(x(6:size), cell2mat(P(6:size)), '-r');
-plot(x(6:size), cell2mat(y), '-g');
-plot(x(6:size), cell2mat(T(6:size)), '-b');
+plot(args(6:size), cell2mat(P(6:size)), '-r');
+plot(args(6:size), cell2mat(T(6:size)), '-b');
+plot(args(6:size), cell2mat(y)        , '-g');
+legend('input', 'output', 'etalon');
 hold off
 grid on
-legend('input','output', 'etalon');
-title('Graphics');
 
 waitforbuttonpress
 
-%% 3.5
-figure
+figure('Error')
 hold on
-plot(x(6:size), cell2mat(E), '-r');
+plot(args(6:size), cell2mat(E), '-r'), grid
 hold off
-grid on
-legend('error');
-title('Error');
 
 waitforbuttonpress
 quit
