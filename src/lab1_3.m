@@ -27,8 +27,8 @@ net = init(net);
 net.trainParam.epochs = 50;
 [net, tr] = train(net, P, T);
 
-net.IW{1,1};
-net.b{1};
+net_IW = net.IW{1,1}
+net_b = net.b{1}
 
 %% 3.5
 % Проверить качество обучения на 5и случайных точках
