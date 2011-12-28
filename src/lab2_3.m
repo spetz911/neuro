@@ -21,7 +21,7 @@ inputVal = zeros(1,size);
 outputVal = zeros(1,size);
 args = t0:h:t1;
 for i = 1:size
-    t = args(i-1);
+    t = args(i);
     inputVal(i) = sin(-3*t*t+5*t+10);
     outputVal(i) = sin(-3*t*t + 5*t - 3)/3;
 end
@@ -30,8 +30,6 @@ T = con2seq(outputVal);
 
 %% 3.2
 % Задать задержки от 1 до 5. Задать скорость обучения равной 0.1.
-% net = newlin([-1,1], 1, 0, 0.1);
-% net.inputweights{1,1}.delays = [1 2 3 4 5];
 net = newlin(P, outputVal, [1 2 3 4 5], 0.1);
 
 %% 3.3
@@ -40,8 +38,8 @@ net.inputweights{1,1}.initFcn = 'rands';
 net.biases{1}.initFcn = 'rands';
 net = init(net);
 
-display(net.IW{1,1});
-display(net.b{1});
+net_IW = net.IW{1,1}
+net_b = net.b{1}
 
 %% 3.4
 % Выполнить адаптацию с числом циклов равным 50. Занести в отчет величину ошибки
@@ -50,25 +48,26 @@ display(net.b{1});
 % В дальнейшем использовать входную и выходную последовательности, начиная с 6 элемента.
 net.adaptParam.passes = 50;
 [net, y, E, pf, af] = adapt(net, P(6:size), T(6:size), P(1:5));
-display(sqrt(mse(E)));
+sqrt_mse = sqrt(mse(E))
 
 %% 3.5
 % Отобразить на графике входные и эталонные значения и значения, предсказанные сетью,
 % также отобразить точки заданного интервала. С помощью функции legend подписать кривые.
 % Перед отображением привести значения из массива ячеек к матрице.
 
-figure('Graphics')
+figure('Name', 'Graphics')
+title('Network results')
 hold on
 plot(args(6:size), cell2mat(P(6:size)), '-r');
 plot(args(6:size), cell2mat(T(6:size)), '-b');
 plot(args(6:size), cell2mat(y)        , '-g');
-legend('input', 'output', 'etalon');
+legend('input', 'output', 'original');
 hold off
 grid on
 
-waitforbuttonpress
 
-figure('Error')
+figure('Name', 'Error')
+title('Error')
 hold on
 plot(args(6:size), cell2mat(E), '-r'), grid
 hold off
