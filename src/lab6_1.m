@@ -73,7 +73,12 @@ X = sim(net, {1 100}, [], p1(:));
 X = reshape(X{100},12,10);
 X(X >= 0) = 2;
 X(X < 0) = 1;
-
+map = [1,1,1;0,0,0];
+figure;
+image(X);
+colormap(map)
+axis off
+axis image
 
 
 %% 1.3
@@ -154,6 +159,7 @@ colormap(map)
 axis off
 axis image
 
-
+waitforbuttonpress
+quit
 
 

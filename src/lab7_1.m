@@ -21,6 +21,7 @@ P = nngenc(X, clusters, points, deviation);
 %~ Отобразить структуру сети c помощью функций display.
 net = newc(X, clusters);
 display(net);
+view(net)
 
 %% 1.3
 %~ Задать число эпох обучения net.trainParam.epochs равным 50.
@@ -38,11 +39,11 @@ net = train(net, P);
 %~ На графике исходное множество, центры кластеров и дополнительные точки должны быть изображены разным цветом,
 %~ также должна быть отображена сетка.
 
+rands(2,15);
+
 rP = rands(2,5)
 rT = vec2ind(sim(net, rP))
-
 w = net.iw{1,1};
-In = In';
 
 figure;
 title('Points');
@@ -51,4 +52,7 @@ plot(w(:,1), w(:,2),'ob');
 plot(rP(1,:)',rP(2,:)','or');
 plot(P(1,:)',P(2,:)','og');
 hold off;
+
+waitforbuttonpress
+quit
 

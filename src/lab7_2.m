@@ -39,19 +39,23 @@ net = train(net, P);
 %~ (plotsom(net.iw{1,1}, net.layers{1}.distances)), и 5 дополнительных точек.
 %~ На графике исходное множество, центры кластеров и дополнительные точки должны быть изображены разным цветом,
 %~ также должна быть отображена сетка.
+rands(2,15);
 rP = rands(2,5)
 
-res = vec2ind(sim(net, In))
+res = vec2ind(sim(net, rP))
 
-display(net.IW{1,1});
-plotsom(net.IW{1, 1}, net.layers{1}.distances)
+w = net.iw{1,1}
+
 
 figure;
 title('Points');
 hold on;
+plotsom(net.IW{1, 1}, net.layers{1}.distances)
 plot(w(:,1), w(:,2),'ob');
 plot(rP(1,:)',rP(2,:)','or');
 plot(P(1,:)',P(2,:)','og');
 hold off;
 
+waitforbuttonpress
+quit
 
