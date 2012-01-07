@@ -61,7 +61,7 @@ plotpv(P, T), grid
 plotpc(net.IW{1,1}, net.b{1})
 hold off
 
-% waitforbuttonpress
-% quit
+waitforbuttonpress
+quit
 
 

@@ -22,14 +22,23 @@ T = sin(P.^2-2*P+3);
 %~ • константу SPREAD задать равной 10∗h, где h — величина шага для заданной функции (например, 0.01);
 %~ • размер обучающей выборки Q задать равным числу столбцов P1;
 %~ • число эпох обучения между выводами информации в окно Trainig with newrb dn задать равным 10.
+
+
 [trainInd, valInd, testInd] = dividerand(size(P, 2),0.8,0.0,0.2);
 P1 = P(trainInd);
 T1 = T(trainInd);
-net = newrb(P1, T1, 1e-8, 0.25, size(P1, 2), 10);
+eg = 1e-8; % sum-squared error goal
+sc = 0.25;  % spread constant
+dn = 10;
+net = newrb(P1, T1, eg, sc, size(P1, 2), dn);
 
 %% 2.3
 %~ Отобразить структуру сети.
 display(net);
+
+net_IW = net.IW{1,1}
+net_b = net.b{1}
+net_LV = net.LW{2,1}
 
 %% 2.4
 %~ Если результаты неудовлетворительные, то изменить значение SPREAD и создать новую сеть.
@@ -43,19 +52,28 @@ display(net);
 %~ error = T - net(P).
 result = sim(net, P);
 error = T - result;
-sqrt(mse(error))
+sqrt_mse = sqrt(mse(error))
 
 %% 2.6
 %~ Отобразить на графике эталонные значения и предсказанные сетью,
 %~ также отобразить точки заданного интервала.
 %~ С помощью функции legend подписать кривые.
 %~ Также указать полное название метода обучения.
+figure
+hold on
 plot(P, result, 'b', P, T, 'r'), grid;
 legend('Network output', 'Target');
 title('Radial basis network');
+hold off
 
 %% 2.7
 %~ Отобразить ошибку обучения. На графике отобразить сетку и указать шкалу времени.
+figure
+hold on
 plot(P, error), grid;
 legend('Error');
+hold off
+
+waitforbuttonpress
+quit
 

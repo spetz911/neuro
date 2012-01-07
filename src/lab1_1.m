@@ -75,7 +75,7 @@ net.trainParam.epochs = 50;
 %% 1.4.3 
 % Проверить качество обучения на 3х случайных точках
 randP = rands(2, 3);
-randT = sim(net, rP);
+randT = sim(net, randP);
 
 % конкатенируем матрицы горизонтально
 plotpv(horzcat(P, randP), horzcat(T, randT)), grid
@@ -83,3 +83,4 @@ plotpc(net.IW{1,1}, net.b{1})
 
 waitforbuttonpress
 quit
+

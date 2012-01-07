@@ -42,20 +42,27 @@ display(net);
 %~ error = T - net(P).
 result = sim(net, P);
 error = T - result;
-sqrt(mse(error))
+sqrt_mse = sqrt(mse(error))
 
 
 %% 3.6
 %~ Отобразить на графике эталонные значения и предсказанные сетью, также отобразить точки заданного интервала.
 %~ С помощью функции legend подписать кривые. Также указать полное название метода обучения.
+figure
+hold on
 plot(P, result, 'b', P, T, 'r'), grid;
 legend('Network output', 'Target');
 title('Generalized regression neural network');
-
+hold off
 
 %% 3.7
 %~ Отобразить ошибку обучения. На графике отобразить сетку и указать шкалу времени.
+figure
+hold on
 plot(P, error), grid;
 legend('Error');
+hold off
 
+waitforbuttonpress
+quit
 

@@ -30,33 +30,30 @@ R = [2 4 7];
 
 P = [repmat(p1,1,R(1)), p2, repmat(p1,1,R(2)), p2, repmat(p1,1,R(3)), p2];
 T = [repmat(t1,1,R(1)), t2, repmat(t1,1,R(2)), t2, repmat(t1,1,R(3)), t2];
-Pseq = con2seq(P);
-Tseq = con2seq(T);
 
 
 %% 2.2
 %~ Создать сеть с помощью функции distdelaynet. Задать задержки от 0 до 4 для первого и второго слоев.
 %~ Число нейронов скрытого слоя задать равным 8. Отобразить структуру сети c помощью функций display.
-d1 = 0:4;
-d2 = 0:4;
-net = distdelaynet({d1, d2}, 8, 'trainbr');
+net = distdelaynet({0:4, 0:4}, 8, 'trainlm');
 
 display(net);
+view(net);
 
-
+quit
 
 %% 2.3
 %~ С помощью функции preparets сформировать массивы ячеек для функции обучения,
 %~ содержащие обучающее множество и значения для инициализации задержек двух слоев (P,T,Pi,Ai соответственно).
 %~ Если при выполнении заданий используется версия MATLAB, которая не поддерживает эту функцию,
 %~ то обучать и выполнять расчет выходов сети без инициализации задержек.
-[Ps,Pi,Ai,Ts] = preparets(net,Pseq,Tseq);
+[Ps,Pi,Ai,Ts] = preparets(net,con2seq(P),con2seq(T));
 
 
 %% 2.4
 %~ Задать параметры обучения: число эпох обучения (net.trainParam.epochs) равным 100,
 %~ предельное значение критерия обучения (net.trainParam.goal) равным 10^-5.
-net.trainParam.epochs = 500;
+net.trainParam.epochs = 25;
 net.trainParam.goal = 1e-5;
 
 
@@ -68,16 +65,14 @@ net.trainParam.goal = 1e-5;
 %~ Занести в отчет весовые коэффициенты и смещения для двух слоев после обучения.
 %~ Занести в отчет графики Performance, Training State, а также окно Neural Network Training.
 net = train(net, Ps, Ts, Pi, Ai);
-
-
-
+% plotperform(net);
 
 %% 2.6
 %~ Занести в отчет величину ошибки обучения с помощью функций sqrt(mse(e)),
 %~ где e задает разность между выходными значениями сети и эталонными значениями обучающего множества.
 out = sim(net, Ps, Pi, Ai, Ts);
 err = cell2mat(out) - cell2mat(Ts);
-display(sqrt(mse(err)));
+sqrt_mse = sqrt(mse(err));
 
 
 %% 2.7
@@ -93,6 +88,7 @@ plot(cell2mat(Ts), 'g');
 hold off;
 legend('output', 'etalon');
 
+waitforbuttonpress
 
 %% 2.8
 %~ Отобразить ошибку обучения. На графике отобразить сетку и точки заданного интервала.
@@ -105,19 +101,23 @@ plot(err, 'b'),grid;
 hold off;
 legend('error');
 
+waitforbuttonpress
 
 %% 2.9
 %~ Для проверки качества распознавания сформировать новое обучающее множество,
 %~ изменив одно из значений R = {r1 , r2 , r3 }.
 %~ Рассчитать выходы сети для измененной входной последовательности.
-R = [1 6 6];
+R = [2 4 6];
 
 P = [repmat(p1,1,R(1)), p2, repmat(p1,1,R(2)), p2, repmat(p1,1,R(3)), p2];
 T = [repmat(t1,1,R(1)), t2, repmat(t1,1,R(2)), t2, repmat(t1,1,R(3)), t2];
-Pseq = con2seq(P);
-Tseq = con2seq(T);
 
-[Ps,Pi,Ai,Ts] = preparets(net,Pseq,Tseq);
+[Ps,Pi,Ai,Ts] = preparets(net,con2seq(P),con2seq(T));
+out = sim(net, Ps, Pi, Ai, Ts);
+
+err = cell2mat(out) - cell2mat(Ts);
+sqrt_mse = sqrt(mse(err))
+
 
 %% 2.10
 %~ Отобразить на графике новые эталонные значения и предсказанные сетью,
@@ -128,7 +128,7 @@ xlabel('t');
 ylabel('y');
 hold on;
 plot(cell2mat(out), 'b'), grid;
-plot(cell2mat(Ts), 'g');
+plot(cell2mat(Ts), '.-g');
 hold off;
 legend('output', 'etalon');
 
@@ -142,4 +142,6 @@ hold on;
 plot(err, 'b'), grid;
 legend('error');
 
+waitforbuttonpress
+quit
 

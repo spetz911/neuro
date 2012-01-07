@@ -14,24 +14,34 @@ clc;
 %~ Для обучения сети использовать обучающее множество без 20 последних элементов.
 P = 0:0.01:2.2;
 T = sin(0.5*P.^2-5*P);
-net = timedelaynet(1:5,8);
-display(net);
-n = size(T, 2);
-T1 = T(1:(n-20));
-sT1 = con2seq(T1);
+
+P1 = P(1:end-20);
+T1 = T(1:end-20);
 
 %% 1.2
 %~ Создать сеть с помощью функции timedelaynet. Число нейронов скрытого слоя задать равным 8.
 %~ Задать задержки от 1 до 5. Отобразить структуру сети c помощью функций display.
 net = timedelaynet(1:5, 8);
 display(net);
+view(net)
 
 %% 1.3
 %~ С помощью функции preparets сформировать массивы ячеек для функции обучения,
 %~ содержащие обучающее множество и значения для инициализации линии задержек
 %~ (P,T,Pi соответственно).
-[Xs, Xi, Ai, Ts] = preparets(net,sT1, sT1);
+[Ps, Pi, Ai, Ts] = preparets(net,con2seq(P1),con2seq(T1));
 
+%%~ HELP
+%~ preparets(net,Xnf,Tnf,Tf,EW) takes these arguments:
+% net	Neural network
+% Xnf	Non-feedback inputs
+% Tnf	Non-feedback targets
+% Tf	Feedback targets
+%~ and returns:
+% Xs	Shifted inputs
+% Xi	Initial input delay states
+% Ai	Initial layer delay states
+% Ts	Shifted targets
 
 
 %% 1.4
@@ -46,29 +56,34 @@ net.trainParam.goal = 1e-8;
 %~ Если результаты неудовлетворительные или наблюдается переобучение, то изменить число нейронов.
 %~ Занести в отчет весовые коэффициенты и смещения для двух слоев после обучения.
 %~ Занести в отчет график Performance, а также окно Neural Network Training.
-net = train(net, Xs, Ts, Xi, Ai);
+net = train(net, Ps, Ts, Pi, Ai);
 
 %% 1.6
 %~ Занести в отчет величину ошибки обучения с помощью функций sqrt(mse(e)),
 %~ где e задает разность между выходными значениями сети и эталонными значениями обучающего множества.
 %~ При расчете выхода сети инициализировать линию задержки.
-out = sim(net, Xs, Xi, Ai, Ts);
+out = sim(net, Ps, Pi, Ai);
+IW = net.IW{1}
+LW = net.LW{2,1}
+b1 = net.b{1}
+b2 = net.b{2}
 err = cell2mat(out) - cell2mat(Ts);
-display(sqrt(mse(err)));
+sqrt_mse = sqrt(mse(err))
 
 %% 1.7
 %~ Отобразить на графике эталонные значения и предсказанные сетью,
 %~ также отобразить точки заданного интервала.
 %~ С помощью функции legend подписать кривые.
 figure;
-title('predicated and etalon values');
+title('predicted and etalon values');
 xlabel('t');
 ylabel('y');
 hold on;
-plot(P(6:n-20), cell2mat(out), '.-r'), grid;
-plot(P(6:n-20), cell2mat(Ts), 'b');
+plot(cell2mat(Ps), cell2mat(out), '.-r'), grid;
+plot(cell2mat(Ps), cell2mat(Ts), 'b');
 hold off;
-legend('output', 'etalon');
+legend('network output', 'etalon');
+
 
 %% 1.8
 %~ Отобразить ошибку обучения. На графике отобразить сетку и точки заданного интервала.
@@ -77,38 +92,37 @@ title('error');
 xlabel('t');
 ylabel('y');
 hold on;
-plot(P(6:n-20), err, 'b'), grid;
+plot(cell2mat(Ps), err, '.-b'), grid;
 hold off;
 legend('error');
 
 %% 1.9
 %~ Выполнить с помощью сети прогноз на оставшиеся 20 временных отсчетов.
 %~ Для этого инициализировать линию задержки последними 5 значениями из обучающего множества.
-P25 = con2seq(T(n-20-5+1:end));
-T25 = P25;
-[Ps,Pi,Ai,Ts] = preparets(net,P25,T25);
-out = sim(net, Ps, Pi);
+[Ps,Pi,Ai,Ts] = preparets(net,con2seq(P(end-25:end)),con2seq(T(end-25:end)));
+out = sim(net, Ps, Pi, Ai); %??? инициализировать линию задержки
 
 %% 1.10
 %~ Занести в отчет величину ошибки прогнозирования с помощью функций sqrt(mse(e)),
 %~ где e задает разность между значениями, предсказанными сетью,
 %~ и последними 20 эталонными значениями обучающего множества.
-err = cell2mat(out) - cell2mat(T25(5+1:end));
-display(sqrt(mse(err)));
+err = cell2mat(out) - cell2mat(Ts);
+sqrt_mse = sqrt(mse(err))
 
 %% 1.11
 %~ Отобразить на графике эталонные значения и предсказанные сетью,
 %~ также отобразить точки заданного интервала.
 %~ С помощью функции legend подписать кривые.
 figure;
-title('etalon and predicated values');
+title('etalon and predicted values');
 xlabel('t');
 ylabel('y');
 hold on;
-plot(P(n-20+1:end), cell2mat(out), '.-r'),grid;
-plot(P(n-20+1:end), cell2mat(Ts), 'b');
+plot(cell2mat(Ps), cell2mat(out), '.-r'), grid;
+plot(cell2mat(Ps), cell2mat(Ts), 'b');
 hold off;
 legend('predicted fcn', 'etalon');
+
 
 %% 1.12
 %~ Отобразить ошибку прогнозирования.
@@ -118,8 +132,10 @@ title('error');
 xlabel('t');
 ylabel('y');
 hold on;
-plot(P(n-20+1:end), err, 'b'),grid;
+plot(cell2mat(Ps), err, 'b'), grid;
 hold off;
 legend('error');
 
+waitforbuttonpress
+quit
 

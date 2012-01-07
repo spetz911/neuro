@@ -20,7 +20,7 @@ T = sin(P.^2-2*P+3);
 %~ чения определяется вариантом задания. Разделение обучающей выборки на обучающее,
 %~ контрольное, и тестовое подмножества производится с помощью функции заданной по
 %~ умолчанию (dividerand) в соотношении 60%, 20%, 20%. Отобразить структуру сети.
-net = feedforwardnet(18);
+net = feedforwardnet(10);
 net = configure(net, P, T);
 net.trainFcn = 'trainlm';
 net.divideParam.trainRatio = 0.6;
@@ -82,4 +82,6 @@ title('Levenberg-Marquardt backpropagation');
 plot(P, error),grid;
 legend('Error');
 
+waitforbuttonpress
+quit
 
