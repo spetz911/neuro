@@ -40,7 +40,6 @@ net = distdelaynet({0:4, 0:4}, 8, 'trainlm');
 display(net);
 view(net);
 
-quit
 
 %% 2.3
 %~ С помощью функции preparets сформировать массивы ячеек для функции обучения,
@@ -53,7 +52,7 @@ quit
 %% 2.4
 %~ Задать параметры обучения: число эпох обучения (net.trainParam.epochs) равным 100,
 %~ предельное значение критерия обучения (net.trainParam.goal) равным 10^-5.
-net.trainParam.epochs = 25;
+net.trainParam.epochs = 10;
 net.trainParam.goal = 1e-5;
 
 
@@ -128,7 +127,7 @@ xlabel('t');
 ylabel('y');
 hold on;
 plot(cell2mat(out), 'b'), grid;
-plot(cell2mat(Ts), '.-g');
+plot(cell2mat(Ts), '-g');
 hold off;
 legend('output', 'etalon');
 

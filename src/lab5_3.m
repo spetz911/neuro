@@ -83,7 +83,7 @@ title('etalon and predicted values1');
 xlabel('k');
 ylabel('y');
 hold on;
-plot(cell2mat(out), '.-r'), grid;
+plot(cell2mat(out), '-r'), grid;
 plot(cell2mat(Ts), 'b');
 hold off;
 legend('output', 'etalon');
@@ -96,7 +96,7 @@ title('error1');
 xlabel('k');
 ylabel('error');
 hold on;
-plot(err, '.-b'), grid;
+plot(err, '-b'), grid;
 hold off;
 legend('error');
 

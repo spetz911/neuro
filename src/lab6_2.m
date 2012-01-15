@@ -24,7 +24,7 @@ k1 = 0:0.01:1;
 [~,n1] = size(k1);
 t1 = -ones(1, n1);
 p1 = sin(4*pi*k1);
-k2 = 0.92:h:4.07;
+k2 = 0.92:0.01:4.07;
 [~,n2] = size(k2);
 t2 = ones(1, n2);
 p2 = sin(-2*k2.^2 + 7*k2);
@@ -55,7 +55,7 @@ view(net);
 %% 2.4
 %~ Задать параметры обучения: число эпох обучения (net.trainParam.epochs) равным 100,
 %~ предельное значение критерия обучения (net.trainParam.goal) равным 10^-5.
-net.trainParam.epochs = 100;
+net.trainParam.epochs = 10;
 net.trainParam.goal = 1e-5;
 
 %% 2.5
