@@ -73,6 +73,10 @@ out = sim(net, Ps, Pi, Ai, Ts);
 err = cell2mat(out) - cell2mat(Ts);
 sqrt_mse = sqrt(mse(err));
 
+IW = net.IW{1}
+LW = net.LW{2,1}
+b1 = net.b{1}
+b2 = net.b{2}
 
 %% 2.7
 %~ Отобразить на графике эталонные значения и предсказанные сетью,
